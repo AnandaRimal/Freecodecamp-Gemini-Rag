@@ -7,12 +7,14 @@ A powerful Retrieval-Augmented Generation (RAG) chat application demonstrating t
 ## 📖 Table of Contents
 
 1. [Understanding Gemini File Search](#-understanding-gemini-file-search)
-2. [About This Project](#-about-this-project)
-3. [Getting Started](#-getting-started)
-4. [Usage](#-usage)
-5. [API Documentation](#-api-documentation)
-6. [Project Structure](#-project-structure)
-7. [Configuration](#-configuration)
+2. [Advanced Capabilities](#-advanced-capabilities)
+3. [Cost Analysis](#-cost-analysis)
+4. [About This Project](#-about-this-project)
+5. [Getting Started](#-getting-started)
+6. [Usage](#-usage)
+7. [API Documentation](#-api-documentation)
+8. [Project Structure](#-project-structure)
+9. [Configuration](#-configuration)
 
 ---
 
@@ -24,88 +26,75 @@ A powerful Retrieval-Augmented Generation (RAG) chat application demonstrating t
 
 ### How Does It Work?
 
-```mermaid
-graph LR
-    A[Upload Documents] --> B[Automatic Chunking]
-    B --> C[Vector Embeddings]
-    C --> D[File Search Store]
-    D --> E[Semantic Search]
-    E --> F[Context-Aware Responses]
-```
+![Gemini File Search Architecture](File-search%20(2).png)
 
-#### Key Concepts
+As illustrated above, the workflow involves:
 
-1. **File Upload**: Documents are uploaded to Google's servers via the Gemini API
-2. **Automatic Chunking**: Gemini automatically splits documents into optimal chunks
-3. **Vector Embeddings**: Each chunk is converted into mathematical representations (vectors)
-4. **File Search Stores**: Documents are organized into searchable "stores" (like vector databases)
-5. **Semantic Search**: When you ask a question, Gemini finds the most relevant chunks
-6. **Augmented Generation**: The AI generates responses grounded in your documents
+1.  **User Query**: The user asks a question via the frontend.
+2.  **File Search Tool**: The query is sent to the Gemini API, which utilizes the File Search tool.
+3.  **Vector Store**: Gemini searches the relevant vector store (e.g., Business, Science) where documents are indexed.
+4.  **Retrieval**: Relevant chunks of text are retrieved based on semantic similarity.
+5.  **Generation**: The Gemini model generates a response using the retrieved chunks as context.
 
 ### Why Use File Search?
 
-| Traditional RAG | Gemini File Search |
-|----------------|-------------------|
-| Manual chunking strategy | ✅ Automatic optimal chunking |
-| Choose embedding model | ✅ Built-in embeddings |
-| Manage vector database | ✅ Managed storage |
-| Implement retrieval logic | ✅ Integrated search |
-| Complex infrastructure | ✅ Simple API calls |
+| Feature | Traditional RAG | Gemini File Search |
+| :--- | :--- | :--- |
+| **Chunking** | Manual strategy required (fixed size, semantic, etc.) | ✅ **Automatic & Intelligent** (or Custom) |
+| **Embeddings** | Must choose and manage embedding models | ✅ **Built-in & Managed** |
+| **Vector DB** | Requires setup (Pinecone, Milvus, etc.) | ✅ **Fully Managed Storage** |
+| **Retrieval** | Complex logic to implement | ✅ **Integrated & Optimized** |
+| **Scalability** | Hard to scale infrastructure | ✅ **Google-scale Infrastructure** |
+| **Cost** | Pay for DB + Compute + Embeddings | ✅ **Pay only for Indexing & Generation** |
 
-### File Search Capabilities
+---
 
-- **Supported Formats**: PDF, TXT, HTML, Markdown, and more
-- **Chunking**: Intelligent document segmentation with overlap
-- **Multi-file Search**: Query across multiple documents simultaneously
-- **Store Management**: Organize documents into logical groups
-- **Real-time Updates**: Add or remove documents from stores dynamically
+## 🚀 Advanced Capabilities
 
-### Basic File Search Workflow
+### Custom Chunking
 
+While Gemini handles chunking automatically, you can fine-tune it for specific needs. This is crucial for optimizing retrieval accuracy.
+
+**How it works:**
+- **Max Tokens per Chunk**: Controls the size of each text segment.
+- **Overlap**: Ensures context isn't lost between chunks.
+
+**Example Configuration:**
 ```python
-from google import genai
-
-# 1. Initialize client
-client = genai.Client(api_key="YOUR_API_KEY")
-
-# 2. Upload a document
-file = client.files.upload(
-    file='document.pdf',
-    config={'name': 'my-document'}
-)
-
-# 3. Create a File Search store
-store = client.file_search_stores.create(
-    config={'display_name': 'My Knowledge Base'}
-)
-
-# 4. Import file into store
-operation = client.file_search_stores.import_file(
-    file_search_store_name=store.name,
-    file_name=file.name
-)
-
-# 5. Query with File Search tool
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="What does the document say about...?",
-    config={
-        'tools': [{
-            'file_search': {
-                'file_search_store_names': [store.name]
-            }
-        }]
-    }
-)
+chunking_config = {
+    "chunk_size": 500,  # Max tokens per chunk (100-500)
+    "chunk_overlap": 100 # Tokens of overlap
+}
 ```
 
-### File Search Use Cases
+**Advantages:**
+- **Precision**: Smaller chunks for precise fact retrieval.
+- **Context**: Larger chunks for broader thematic understanding.
 
-- 📚 **Document Q&A**: Answer questions about research papers, manuals, reports
-- 🏢 **Enterprise Knowledge Bases**: Search company documentation and policies
-- 📖 **Educational Tools**: Interactive learning from textbooks and materials
-- 🔍 **Legal/Compliance**: Query contracts, regulations, and legal documents
-- 📊 **Data Analysis**: Extract insights from reports and data documentation
+### Large Document Handling
+
+Gemini File Search is designed for scale:
+- **High Capacity**: Supports millions of tokens per store.
+- **Parallel Processing**: Upload and index multiple files simultaneously.
+- **Smart Filtering**: Filter search results by metadata (e.g., file name, date).
+
+---
+
+## 💰 Cost Analysis
+
+Gemini File Search offers a highly competitive pricing model, especially for read-heavy applications.
+
+| Component | Cost | Notes |
+| :--- | :--- | :--- |
+| **Storage** | **FREE** | Up to 1GB of vector storage is free. |
+| **Indexing** | **$0.15 / 1M tokens** | One-time cost when you upload/index a file. |
+| **Querying** | **Standard Model Rates** | You pay for the input/output tokens of the model (e.g., Gemini 1.5 Flash). |
+| **Cache** | **FREE** | Context caching for frequently used files is automatic and free. |
+
+**Why this is cheaper:**
+- No monthly vector database fees.
+- No separate cost for embedding generation during queries.
+- You only pay once to index your knowledge base.
 
 ---
 
