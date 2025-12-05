@@ -49,7 +49,7 @@ def chat_with_stores(prompt: str, store_names: list[str]):
             model="gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
-                system_instruction="You are a helpful assistant. You have access to a knowledge base of documents. Always use the file_search tool to find relevant information to answer the user's question. If the answer is not found in the documents, say so.",
+                system_instruction="You are a helpful assistant. You have access to a knowledge base of documents. Always use the file_search tool to find relevant information to answer the user's question. If the answer is not found in the documents, say no.",
                 tools=[
                     types.Tool(
                         file_search=types.FileSearch(
